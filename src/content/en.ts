@@ -1,0 +1,61 @@
+export const en = {
+  meta: {
+    title: "Rafiqi for companies | Sign up and join the app",
+    titleWith: "Join Rafiqi with {company} | Rafiqi",
+    description: "Sign up with your name, email and company, then download Rafiqi and register in the app with the same email.",
+  },
+  brand: "Rafiqi",
+  skip: "Skip to content",
+  language: "Language",
+  languages: [
+    { lang: "en", label: "EN", name: "English" },
+    { lang: "ar", label: "عربي", name: "" },
+  ],
+  signup: {
+    eyebrow: "Rafiqi for companies",
+    title: "Join Rafiqi with your company",
+    titleWith: "Join Rafiqi with {company}",
+    lead: "Sign up here with your company email, then download the Rafiqi app and register with the same company email. Your company will see that you've joined.",
+    stepsLabel: "How it works",
+    steps: [
+      "Sign up with your name, company email and company",
+      "Download Rafiqi from the App Store or Google Play",
+      "Register in the app with the same company email",
+    ],
+    formTitle: "Your details",
+    fullName: "Full name",
+    email: "Company email",
+    emailHint: "Your work email at your company, not a personal one like Gmail or Hotmail. Register in the Rafiqi app with this same email.",
+    company: "Company",
+    companyHint: "Choose the company you work for.",
+    companyFixedHint: "Set by your company's invite link.",
+    notice: "Rafiqi stores your name, email and company and shares them with your company to track who has joined.",
+    autosave: {
+      idle: "Your details save automatically once every field is filled in.",
+      saving: "Saving…",
+      saved: "Saved. Any change you make saves automatically.",
+    },
+    errors: {
+      fullName: "Enter your full name.",
+      email: "Enter a valid email, like name@company.com.",
+      personalEmail: "Use your company email, not a personal one (Gmail, Hotmail, Outlook, Yahoo, iCloud).",
+      company: "Choose your company.",
+      rateLimited: "Too many attempts. Try again in a few minutes.",
+      failed: "Your details couldn't be saved. Check your connection; we'll try again when you change a field.",
+    },
+    success: {
+      title: "You're signed up, {name}",
+      next: "Next: download Rafiqi and create your account with this company email:",
+      note: "Already have the app? You're only counted if your Rafiqi profile uses this same company email.",
+      again: "Sign up someone else",
+    },
+  },
+  stores: {
+    label: "Download Rafiqi",
+    appStore: { alt: "Download on the App Store", lang: "en" },
+    googlePlay: { alt: "Get it on Google Play", lang: "en", src: "/badges/google-play-en.png" },
+  },
+  footer: {
+    privacy: "Privacy policy",
+  },
+};

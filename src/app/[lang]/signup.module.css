@@ -1,0 +1,312 @@
+/* Navy hero continuing the top bar, the form card rising into it. */
+.hero {
+  background: var(--hero);
+  color: var(--on-hero);
+  padding-block: var(--space-8) var(--space-16);
+}
+
+/* Centred over the form card below. */
+.heroInner {
+  width: var(--page);
+  margin-inline: auto;
+  text-align: center;
+}
+
+.heroInner > * {
+  max-width: 40rem;
+  margin-inline: auto;
+}
+
+.eyebrow {
+  color: var(--on-hero-icon);
+  font-size: var(--text-base);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+
+.title {
+  font-size: clamp(var(--text-2xl), 5.5vw, 3rem);
+  font-weight: 700;
+}
+
+.lead {
+  margin-top: var(--space-4);
+  color: var(--on-hero-soft);
+}
+
+/* One centred column: the form card, then "How it works" under it. */
+.layout {
+  width: min(100% - 2rem, 36rem);
+  margin-inline: auto;
+  margin-top: calc(-1 * var(--space-10));
+  display: grid;
+  gap: var(--space-10);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-soft);
+  padding: var(--space-6);
+}
+
+@media (min-width: 30em) {
+  .card {
+    padding: var(--space-8);
+  }
+}
+
+.formTitle {
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-6);
+}
+
+.form {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.field label {
+  font-weight: 600;
+}
+
+.labelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+/* Per-field state: a quick spinner, then a green check once the field is
+   filled in correctly. Saving to the database is the status line's job. */
+.fieldStatus {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  color: #1e7b45; /* check circle; white tick on it is 5.3:1 */
+}
+
+.fieldStatus svg {
+  animation: pop 0.25s ease-out;
+}
+
+.spinner {
+  inline-size: 1.1rem;
+  block-size: 1.1rem;
+  border: 2.5px solid var(--brand-track);
+  border-block-start-color: var(--action);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    rotate: 1turn;
+  }
+}
+
+@keyframes pop {
+  from {
+    scale: 0.5;
+    opacity: 0;
+  }
+}
+
+.hint {
+  color: var(--muted);
+  font-size: var(--text-base);
+  margin-top: calc(-1 * var(--space-1));
+}
+
+.field input,
+.field select {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: var(--space-3) var(--space-4);
+  border: 1.5px solid #8a8f99; /* 3.4:1 against white, a visible field edge */
+  border-radius: var(--radius-m);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+
+html[dir="rtl"] .field input[dir="ltr"] {
+  text-align: right; /* the email reads left to right but sits on the field's start edge */
+}
+
+.field :is(input, select):focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 1px;
+  border-color: var(--focus);
+}
+
+.field :is(input, select)[aria-invalid] {
+  border-color: var(--danger);
+}
+
+/* A company fixed by an invite link: reads as set, with a lock, not as a field to fill. */
+.fixed {
+  position: relative;
+  color: var(--muted);
+}
+
+.fixed input {
+  background: var(--band);
+  border-color: var(--line);
+  font-weight: 600;
+  padding-inline-end: var(--space-10);
+  cursor: default;
+}
+
+.fixed svg {
+  position: absolute;
+  inset-inline-end: var(--space-4);
+  top: 50%;
+  translate: 0 -50%;
+}
+
+.error {
+  color: var(--danger);
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+/* Save status under the fields: grey while incomplete, blue while saving,
+   green once saved, red on an error. Always text, never colour alone. */
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 3rem;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-m);
+  background: var(--band);
+  color: var(--muted);
+  font-size: var(--text-base);
+}
+
+.status svg {
+  flex: none;
+}
+
+.status[data-status="saving"] {
+  color: var(--link);
+}
+
+.status[data-status="saved"] {
+  background: var(--good);
+  color: var(--on-good);
+  font-weight: 600;
+}
+
+.status[data-status="error"] {
+  background: var(--danger-tint);
+  color: var(--danger);
+  font-weight: 600;
+}
+
+/* How the details are used, in place of a consent tick-box. */
+.notice {
+  color: var(--muted);
+  font-size: var(--text-base);
+}
+
+.trap {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* Next step, shown under the form once the details have saved. */
+.next {
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--line);
+}
+
+.doneTitle {
+  font-size: var(--text-xl);
+}
+
+.doneNext {
+  margin-top: var(--space-3);
+}
+
+.emailChip {
+  display: inline-block;
+  margin-block: var(--space-3) var(--space-6);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-m);
+  background: var(--band);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.note {
+  margin-top: var(--space-6);
+  color: var(--muted);
+  font-size: var(--text-base);
+}
+
+.linkButton {
+  margin-top: var(--space-4);
+  min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--link);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+/* How it works */
+.steps {
+  padding-inline: var(--space-2);
+}
+
+.stepsTitle {
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-4);
+}
+
+.steps ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+  counter-reset: step;
+}
+
+.steps li {
+  counter-increment: step;
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.steps li::before {
+  content: counter(step);
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--band);
+  color: var(--link);
+  font-weight: 700;
+}
