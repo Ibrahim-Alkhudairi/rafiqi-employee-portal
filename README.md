@@ -49,8 +49,8 @@ npm run build
 ## Deploying
 The portal runs on Azure App Service (Linux, Node 22 LTS). Nothing runs in the background, so it doesn't need Always On.
 
-- **Build:** `azure-pipelines.yml` runs on every push to `main`. It builds the standalone server (`output: "standalone"` in `next.config.ts`), adds `public/` and `.next/static`, and publishes `portal.zip` as the `drop` artifact.
-- **Release:** a Release pipeline deploys `portal.zip` to the web app (Azure App Service deployment, Web App on Linux).
+- **GitHub Actions:** `.github/workflows/deploy.yml` runs on every push to `main` (or by hand from the Actions tab). It builds the standalone server (`output: "standalone"` in `next.config.ts`), adds `public/` and `.next/static`, zips it and deploys the zip to the web app `rafiqi-employee-portal`.
+- **GitHub secret:** `AZURE_WEBAPP_PUBLISH_PROFILE`, the web app's publish profile (Azure portal → the web app → Download publish profile). Downloading it needs "SCM Basic Auth Publishing Credentials" turned on in the web app's General settings.
 - **Web app settings:**
   - Startup command: `node server.js`
   - App settings: the ones under Settings, plus `HOSTNAME=0.0.0.0` (listen on every address) and `SCM_DO_BUILD_DURING_DEPLOYMENT=false` (the zip is already built).
