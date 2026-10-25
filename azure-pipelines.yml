@@ -1,0 +1,52 @@
+# Builds the portal on every push to main and publishes portal.zip as the
+# "drop" artifact. A Release pipeline deploys that zip to the App Service web
+# app, whose startup command is `node server.js`. No secrets here: they are app
+# settings on the web app.
+
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  nodeVersion: '22.x'
+
+steps:
+- task: NodeTool@0
+  displayName: 'Install Node.js'
+  inputs:
+    versionSpec: '$(nodeVersion)'
+
+- script: npm ci
+  displayName: 'Install dependencies'
+
+# Also checks the TypeScript.
+- script: npm run build
+  displayName: 'Build'
+
+# The standalone server does not include public/ or .next/static; it serves them
+# once they are copied next to it. -L copies the files behind the build's
+# symlink to mssql, so the zip holds no links.
+- script: |
+    set -e
+    out='$(Build.ArtifactStagingDirectory)/portal'
+    mkdir -p "$out/.next"
+    cp -rL .next/standalone/. "$out/"
+    cp -r public "$out/public"
+    cp -r .next/static "$out/.next/static"
+  displayName: 'Assemble the app'
+
+- task: ArchiveFiles@2
+  displayName: 'Zip the app'
+  inputs:
+    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/portal'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/drop/portal.zip'
+
+- task: PublishPipelineArtifact@1
+  displayName: 'Publish deployment artifact'
+  inputs:
+    targetPath: '$(Build.ArtifactStagingDirectory)/drop'
+    artifact: drop

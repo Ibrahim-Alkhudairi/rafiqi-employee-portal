@@ -47,11 +47,19 @@ npm run build
 ```
 
 ## Deploying
-- **Host:** Node 20.9 or later. Nothing runs in the background, so it doesn't need to be always on.
-- **Environment variables:** set them on the host, as listed under Settings.
-- **Port:** `npm start` listens on the `PORT` the host provides (Azure App Service sets it), or 3000 if none is set.
-- **Database firewall:** must allow the host.
+The portal runs on Azure App Service (Linux, Node 22 LTS). Nothing runs in the background, so it doesn't need Always On.
+
+- **Build:** `azure-pipelines.yml` runs on every push to `main`. It builds the standalone server (`output: "standalone"` in `next.config.ts`), adds `public/` and `.next/static`, and publishes `portal.zip` as the `drop` artifact.
+- **Release:** a Release pipeline deploys `portal.zip` to the web app (Azure App Service deployment, Web App on Linux).
+- **Web app settings:**
+  - Startup command: `node server.js`
+  - App settings: the ones under Settings, plus `HOSTNAME=0.0.0.0` (listen on every address) and `SCM_DO_BUILD_DURING_DEPLOYMENT=false` (the zip is already built).
+  - The server listens on the `PORT` App Service sets.
+- **Domain:** `join.rafiqi.sa`, a `CNAME` to the web app plus an `asuid.join` `TXT` record in the Bluehost DNS, with an App Service Managed Certificate.
+- **Database firewall:** must allow the web app.
 - **Order of steps:**
   1. Deploy the backend with the migration.
   2. Run `db/002_portal_login.sql`.
   3. Deploy the portal.
+
+To try the production build locally: `npm run build`, copy `public` to `.next/standalone/public` and `.next/static` to `.next/standalone/.next/static`, then `node .next/standalone/server.js`.

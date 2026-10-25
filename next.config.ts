@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // The build writes .next/standalone: a server.js plus only the node_modules it
+  // needs, which azure-pipelines.yml packages for App Service.
+  output: "standalone",
   // mssql (tedious) is a Node-only driver; load it from node_modules at runtime
   // instead of bundling it.
   serverExternalPackages: ["mssql"],
