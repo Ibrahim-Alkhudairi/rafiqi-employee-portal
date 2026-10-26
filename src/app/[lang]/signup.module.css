@@ -29,18 +29,12 @@
   font-weight: 700;
 }
 
-.lead {
-  margin-top: var(--space-4);
-  color: var(--on-hero-soft);
-}
-
-/* One centred column: the form card, then "How it works" under it. */
+/* One centred column: the form card. */
 .layout {
   width: min(100% - 2rem, 36rem);
   margin-inline: auto;
   margin-top: calc(-1 * var(--space-10));
-  display: grid;
-  gap: var(--space-10);
+  padding-bottom: var(--space-12);
 }
 
 .card {
@@ -48,7 +42,7 @@
   border: 1px solid var(--line);
   border-radius: var(--radius-l);
   box-shadow: var(--shadow-soft);
-  padding: var(--space-6);
+  padding: var(--space-6) var(--space-5);
 }
 
 @media (min-width: 30em) {
@@ -57,9 +51,86 @@
   }
 }
 
-.formTitle {
-  font-size: var(--text-xl);
-  margin-bottom: var(--space-6);
+/* Register, verify, download: numbered dots joined by a line that turns
+   green as each step is done. */
+.roadmap {
+  --dot: 2.5rem;
+  list-style: none;
+  margin: 0 0 var(--space-6);
+  padding: 0 0 var(--space-6);
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.roadmap li {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.roadmap li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: calc(var(--dot) / 2 - 1.5px);
+  inset-inline-start: calc(50% + var(--dot) / 2 + var(--space-2));
+  inset-inline-end: calc(-50% + var(--dot) / 2 + var(--space-2));
+  height: 3px;
+  border-radius: 3px;
+  background: var(--line);
+  transition: background-color 0.3s ease;
+}
+
+.roadmap li[data-step="done"]::after {
+  background: var(--check);
+}
+
+.dot {
+  display: grid;
+  place-items: center;
+  inline-size: var(--dot);
+  block-size: var(--dot);
+  border: 2px solid #8a8f99;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: var(--text-base);
+  font-weight: 700;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.roadmap li[data-step="current"] .dot {
+  border-color: var(--action);
+  background: var(--action);
+  color: var(--on-action);
+  box-shadow: 0 0 0 5px var(--brand-track);
+}
+
+.roadmap li[data-step="done"] .dot {
+  border-color: var(--check);
+  background: var(--check);
+  color: #fff;
+}
+
+.roadmap li[data-step="done"] .dot svg {
+  animation: pop 0.25s ease-out;
+}
+
+.stepLabel {
+  color: var(--muted);
+  font-size: var(--text-base);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.roadmap li[data-step="current"] .stepLabel {
+  color: var(--ink);
+  font-weight: 700;
 }
 
 .form {
@@ -76,31 +147,147 @@
   font-weight: 600;
 }
 
+/* The email label and its (i) button; the tip's bubble spans the row. */
 .labelRow {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
+  gap: var(--space-1);
+}
+
+.tipButton {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  /* a full-size touch target that doesn't make the row taller */
+  margin-block: calc(-1 * var(--space-3));
+  margin-inline: calc(-1 * var(--space-2));
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--link);
+  cursor: pointer;
+}
+
+.tipButton:hover,
+.tipButton[aria-expanded="true"] {
+  color: var(--action);
+}
+
+.tipButton:focus-visible {
+  outline-offset: -6px;
+}
+
+.tipBubble {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + var(--space-3));
+  inset-inline: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-m);
+  background: var(--hero);
+  color: var(--on-hero);
+  font-size: var(--text-base);
+  font-weight: 400;
+  line-height: 1.55;
+  box-shadow: 0 14px 32px -10px rgb(14 26 59 / 0.5);
+  visibility: hidden;
+  opacity: 0;
+  translate: 0 -4px;
+  transition:
+    opacity 0.15s ease,
+    translate 0.15s ease,
+    visibility 0.15s;
+}
+
+.tipBubble[data-open] {
+  visibility: visible;
+  opacity: 1;
+  translate: none;
+}
+
+/* The arrow, under the (i) button. */
+.tipBubble::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: var(--arrow-x, 1.5rem);
+  translate: -50% 0;
+  border: 7px solid transparent;
+  border-bottom-color: var(--hero);
+}
+
+/* Bridges the gap to the button, so the mouse can move onto the bubble. */
+.tipBubble::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  inset-inline: 0;
+  height: var(--space-3);
+}
+
+/* A field with its check inside, at the end. */
+.control {
+  position: relative;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  min-height: 3.25rem;
+  padding-block: var(--space-3);
+  padding-inline: var(--space-4) 3.25rem;
+  border: 1.5px solid #8a8f99; /* 3.4:1 against white, a visible field edge */
+  border-radius: var(--radius-m);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+
+/* The email reads left to right but sits on the field's start edge, with
+   room for the check on the end. */
+html[dir="rtl"] .field input[dir="ltr"] {
+  text-align: right;
+  padding-left: 3.25rem;
+  padding-right: var(--space-4);
+}
+
+.field :is(input, select):focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 1px;
+  border-color: var(--focus);
+}
+
+.field :is(input, select)[aria-invalid] {
+  border-color: var(--danger);
 }
 
 /* Per-field state: a quick spinner, then a green check once the field is
-   filled in correctly. Saving to the database is the status line's job. */
+   filled in correctly. Saving is the status line's and the roadmap's job. */
 .fieldStatus {
-  flex: none;
-  display: inline-grid;
+  position: absolute;
+  inset-inline-end: var(--space-4);
+  top: 50%;
+  translate: 0 -50%;
+  display: grid;
   place-items: center;
-  inline-size: 1.25rem;
-  block-size: 1.25rem;
-  color: #1e7b45; /* check circle; white tick on it is 5.3:1 */
+  inline-size: 1.375rem;
+  block-size: 1.375rem;
+  color: var(--check);
+  pointer-events: none;
 }
 
 .fieldStatus svg {
+  inline-size: 100%;
+  block-size: 100%;
   animation: pop 0.25s ease-out;
 }
 
 .spinner {
-  inline-size: 1.1rem;
-  block-size: 1.1rem;
+  inline-size: 1.15rem;
+  block-size: 1.15rem;
   border: 2.5px solid var(--brand-track);
   border-block-start-color: var(--action);
   border-radius: 50%;
@@ -120,57 +307,41 @@
   }
 }
 
-.hint {
-  color: var(--muted);
-  font-size: var(--text-base);
-  margin-top: calc(-1 * var(--space-1));
+/* The company dropdown draws its own chevron, with the check before it. */
+.choose select {
+  appearance: none;
+  padding-inline-end: 5rem;
+  cursor: pointer;
 }
 
-.field input,
-.field select {
-  width: 100%;
-  min-height: 3.25rem;
-  padding: var(--space-3) var(--space-4);
-  border: 1.5px solid #8a8f99; /* 3.4:1 against white, a visible field edge */
-  border-radius: var(--radius-m);
-  background: var(--surface);
-  color: var(--ink);
-  font: inherit;
+.choose .fieldStatus {
+  inset-inline-end: 2.75rem;
 }
 
-html[dir="rtl"] .field input[dir="ltr"] {
-  text-align: right; /* the email reads left to right but sits on the field's start edge */
-}
-
-.field :is(input, select):focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 1px;
-  border-color: var(--focus);
-}
-
-.field :is(input, select)[aria-invalid] {
-  border-color: var(--danger);
-}
-
-/* A company fixed by an invite link: reads as set, with a lock, not as a field to fill. */
-.fixed {
-  position: relative;
-  color: var(--muted);
-}
-
-.fixed input {
-  background: var(--band);
-  border-color: var(--line);
-  font-weight: 600;
-  padding-inline-end: var(--space-10);
-  cursor: default;
-}
-
-.fixed svg {
+.chevron {
   position: absolute;
   inset-inline-end: var(--space-4);
   top: 50%;
   translate: 0 -50%;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+/* A company fixed by an invite link: reads as set, with a lock, not as a field to fill. */
+.fixed input {
+  padding-inline-start: 2.75rem;
+  background: var(--band);
+  border-color: var(--line);
+  font-weight: 600;
+  cursor: default;
+}
+
+.lock {
+  position: absolute;
+  inset-inline-start: var(--space-4);
+  top: 50%;
+  translate: 0 -50%;
+  color: var(--muted);
 }
 
 .error {
@@ -213,12 +384,6 @@ html[dir="rtl"] .field input[dir="ltr"] {
   font-weight: 600;
 }
 
-/* How the details are used, in place of a consent tick-box. */
-.notice {
-  color: var(--muted);
-  font-size: var(--text-base);
-}
-
 .trap {
   position: absolute;
   width: 1px;
@@ -227,23 +392,187 @@ html[dir="rtl"] .field input[dir="ltr"] {
   clip-path: inset(50%);
 }
 
-/* Next step, shown under the form once the details have saved. */
-.next {
-  margin-top: var(--space-8);
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--line);
+/* Brings the download popup back once the details have saved. */
+.download {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 3.25rem;
+  padding: var(--space-3) var(--space-6);
+  border: 0;
+  border-radius: var(--radius-m);
+  background: var(--action);
+  color: var(--on-action);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  animation: pop 0.25s ease-out;
+}
+
+.download:hover {
+  background: var(--action-hover);
+}
+
+/* The download popup: a centred card on wider screens, a sheet from the
+   bottom on phones. */
+.popup {
+  width: min(100% - 2rem, 28rem);
+  max-width: none;
+  max-height: calc(100dvh - 2rem);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-l);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 24px 64px -12px rgb(14 26 59 / 0.5);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.popup[open] {
+  animation: popupIn 0.22s ease-out;
+}
+
+.popup::backdrop {
+  background: rgb(14 26 59 / 0.6);
+  animation: fadeIn 0.22s ease-out;
+}
+
+html:has(.popup[open]) {
+  overflow: hidden;
+}
+
+@keyframes popupIn {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+    scale: 0.97;
+  }
+}
+
+@keyframes sheetIn {
+  from {
+    translate: 0 100%;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+.popupBody {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  padding: var(--space-8) var(--space-6) var(--space-6);
+  text-align: center;
+}
+
+@media (max-width: 39.99em) {
+  .popup {
+    width: 100%;
+    max-height: 92dvh;
+    margin: auto 0 0;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .popup[open] {
+    animation: sheetIn 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .popupBody {
+    padding: var(--space-8) var(--space-5) calc(var(--space-5) + env(safe-area-inset-bottom));
+  }
+
+  /* The sheet's grab handle. */
+  .popupBody::before {
+    content: "";
+    position: absolute;
+    top: var(--space-2);
+    inline-size: 2.5rem;
+    block-size: 4px;
+    border-radius: 4px;
+    background: var(--line);
+  }
+}
+
+.close {
+  position: absolute;
+  top: var(--space-2);
+  inset-inline-end: var(--space-2);
+  display: grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.close:hover {
+  background: var(--band);
+  color: var(--ink);
+}
+
+.close:focus-visible {
+  outline-offset: -3px;
+}
+
+.doneIcon {
+  display: grid;
+  place-items: center;
+  inline-size: 3.5rem;
+  block-size: 3.5rem;
+  margin-bottom: var(--space-4);
+  border-radius: 50%;
+  background: var(--good);
+  color: var(--check);
 }
 
 .doneTitle {
   font-size: var(--text-xl);
 }
 
-.doneNext {
-  margin-top: var(--space-3);
+/* "Next step" as a divider across the popup, its arrow pointing down at what
+   to do: a heading, not something to press. */
+.nextStep {
+  justify-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-block: var(--space-6) var(--space-3);
+  color: var(--link);
+  font-size: var(--text-base);
+  font-weight: 700;
+}
+
+.nextStep::before,
+.nextStep::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.nextStep span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.sameEmail {
+  max-width: 24rem;
 }
 
 .emailChip {
   display: inline-block;
+  max-width: 100%;
   margin-block: var(--space-3) var(--space-6);
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-m);
@@ -252,14 +581,17 @@ html[dir="rtl"] .field input[dir="ltr"] {
   overflow-wrap: anywhere;
 }
 
-.note {
-  margin-top: var(--space-6);
-  color: var(--muted);
-  font-size: var(--text-base);
+.badges > div {
+  justify-content: center;
+}
+
+/* Small enough for both badges side by side on a phone. */
+.badges a img {
+  height: clamp(40px, 12vw, 52px);
 }
 
 .linkButton {
-  margin-top: var(--space-4);
+  margin-top: var(--space-5);
   min-height: 2.75rem;
   padding: 0;
   border: 0;
@@ -270,43 +602,4 @@ html[dir="rtl"] .field input[dir="ltr"] {
   text-decoration: underline;
   text-underline-offset: 0.2em;
   cursor: pointer;
-}
-
-/* How it works */
-.steps {
-  padding-inline: var(--space-2);
-}
-
-.stepsTitle {
-  font-size: var(--text-lg);
-  margin-bottom: var(--space-4);
-}
-
-.steps ol {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: var(--space-4);
-  counter-reset: step;
-}
-
-.steps li {
-  counter-increment: step;
-  display: grid;
-  grid-template-columns: 2.5rem 1fr;
-  gap: var(--space-3);
-  align-items: center;
-}
-
-.steps li::before {
-  content: counter(step);
-  display: grid;
-  place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  background: var(--band);
-  color: var(--link);
-  font-weight: 700;
 }

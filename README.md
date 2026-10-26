@@ -2,9 +2,11 @@
 
 A small web portal, for phone and desktop, in Arabic (`/ar/`, right to left) and English (`/en/`), at `https://join.rafiqi.sa`.
 
-- **Employees** fill in their name and email and pick their company from a dropdown, which starts on the first company in the list. A short note under the fields says how the details are used; there is no consent tick-box.
+- **Employees** fill in their name and email and pick their company from a dropdown, which starts on the first company in the list. There is no consent tick-box and no privacy link.
+  - A three-step roadmap above the form (Register, Verify, Download) follows their progress.
+  - Each field shows its green check inside the field once it is filled in correctly. What counts as a company email is in the (i) tooltip beside the email label.
   - There is no sign-up button: the details save on their own once every field is valid.
-  - After that first save, the App Store and Google Play links appear.
+  - After that first save, a popup opens with the App Store and Google Play links (a sheet from the bottom on phones). If they are still typing, it waits for a pause. Once closed, the "Download Rafiqi" button brings it back.
   - Later edits save automatically too. If someone corrects their email, their existing row moves to the new email instead of a second row being added. A signed token from the first save proves it's the same browser.
 - **Rafiqi admins** follow who has gone on to register in the app in the **backoffice**, on the "متابعة تسجيل الموظفين" page. The portal itself has no admin pages.
 

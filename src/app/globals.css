@@ -23,6 +23,7 @@
   --on-pill: #4f3f12;
   --good: #dff3e6;
   --on-good: #135c32;
+  --check: #1e7b45; /* field checks and done steps; white on it is 5.3:1 */
   --danger: #b3261e;
   --danger-tint: #fdecea;
   --line: #e6e1ea;

@@ -3,7 +3,7 @@ import { companies } from "@/lib/companies";
 import { SignupForm } from "./signup-form";
 import s from "./signup.module.css";
 import { StoreBadges } from "./store-badges";
-import { Footer, SkipLink, TopBar } from "./ui";
+import { SkipLink, TopBar } from "./ui";
 
 type Company = (typeof companies)[number];
 
@@ -23,7 +23,6 @@ export function SignupPage({ lang, company }: { lang: Lang; company?: Company })
           <div className={s.heroInner}>
             <p className={s.eyebrow}>{t.signup.eyebrow}</p>
             <h1 className={s.title}>{company ? fill(t.signup.titleWith, { company: company.name[lang] }) : t.signup.title}</h1>
-            <p className={s.lead}>{t.signup.lead}</p>
           </div>
         </div>
         <div className={s.layout}>
@@ -33,19 +32,8 @@ export function SignupPage({ lang, company }: { lang: Lang; company?: Company })
             initialCompany={company?.key}
             badges={<StoreBadges stores={t.stores} />}
           />
-          <section className={s.steps} aria-labelledby="steps-title">
-            <h2 id="steps-title" className={s.stepsTitle}>
-              {t.signup.stepsLabel}
-            </h2>
-            <ol>
-              {t.signup.steps.map((step) => (
-                <li key={step}>{step}</li>
-              ))}
-            </ol>
-          </section>
         </div>
       </main>
-      <Footer t={t} />
     </>
   );
 }

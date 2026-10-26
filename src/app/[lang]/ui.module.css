@@ -106,24 +106,3 @@
   width: auto;
   height: 52px;
 }
-
-.footer {
-  border-top: 1px solid var(--line);
-  margin-top: var(--space-16);
-}
-
-.footerInner {
-  width: var(--page);
-  margin-inline: auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-6);
-  padding-block: var(--space-6);
-  font-size: var(--text-base);
-}
-
-.footerInner a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.75rem;
-}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { links, type Content, type Lang } from "@/content";
+import { type Content, type Lang } from "@/content";
 import s from "./ui.module.css";
 
 export function SkipLink({ t }: { t: Content }) {
@@ -38,15 +38,5 @@ export function TopBar({ t, lang, path }: { t: Content; lang: Lang; path: string
         </div>
       </div>
     </header>
-  );
-}
-
-export function Footer({ t }: { t: Content }) {
-  return (
-    <footer className={s.footer}>
-      <div className={s.footerInner}>
-        <a href={links.privacy}>{t.footer.privacy}</a>
-      </div>
-    </footer>
   );
 }

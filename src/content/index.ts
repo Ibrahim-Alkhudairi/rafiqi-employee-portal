@@ -10,7 +10,6 @@ export const hasLang = (l: string): l is Lang => l in content;
 export const links = {
   appStore: "https://apps.apple.com/sa/app/id1602789379",
   googlePlay: "https://play.google.com/store/apps/details?id=org.liajlehum.rafeeq",
-  privacy: "https://rafiqi-backend.azurewebsites.net/public-files/privacy-policy.html",
 };
 
 /** Fills {placeholders} in a content string. */
