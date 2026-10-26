@@ -6,6 +6,7 @@ import { SignupPage } from "../../signup-page";
 
 // A company's invite link: /ar/join/zain opens the sign-up form with Zain
 // already chosen. Unknown companies are a 404.
+export const dynamicParams = false;
 export const generateStaticParams = () => companies.map((c) => ({ company: c.slug }));
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/join/[company]">): Promise<Metadata> {

@@ -1,10 +1,3 @@
-// The same rule as ASP.NET Identity's UpperInvariantLookupNormalizer
-// (email.Normalize().ToUpperInvariant()), so the result can be compared with
-// AspNetUsers.NormalizedEmail as is.
-export function normalizeEmail(email: string): string {
-  return email.trim().normalize("NFC").toUpperCase();
-}
-
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export function isValidEmail(email: string): boolean {
@@ -12,7 +5,8 @@ export function isValidEmail(email: string): boolean {
 }
 
 // Free mail providers: employees have to use their company email, so these are
-// turned away with a message saying so.
+// turned away with a message saying so. The backend checks the same list
+// (EmployeeSignupService); keep the two in step.
 const PERSONAL_DOMAINS = new Set([
   "gmail.com", "googlemail.com", "msn.com", "icloud.com", "me.com", "mac.com", "aol.com",
   "proton.me", "protonmail.com", "gmx.com", "mail.com", "yandex.com", "zoho.com", "ymail.com",
@@ -38,9 +32,4 @@ export function companyKey(name: string): string {
     .replace(/[^\p{L}\p{N}]+/gu, " ") // punctuation and symbols act as spaces
     .trim()
     .replace(/\s+/g, " ");
-}
-
-// Collapses inner whitespace in names people type; keeps their spelling.
-export function cleanText(value: string): string {
-  return value.normalize("NFC").trim().replace(/\s+/g, " ");
 }

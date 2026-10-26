@@ -1,0 +1,61 @@
+# Builds the portal as static files on every push to main and every pull
+# request. On main it also uploads them to join.rafiqi.sa on Bluehost over FTPS.
+#
+# Repository secrets (Settings → Secrets and variables → Actions): FTP_SERVER,
+# FTP_USERNAME and FTP_PASSWORD, for an FTP account limited to the subdomain's
+# folder. Until they are set, the upload is skipped with a warning.
+
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Uploads run one at a time; a newer push to a pull request replaces its check.
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Baked into the pages at build time; neither is a secret.
+env:
+  NEXT_PUBLIC_API_URL: https://api.rafiqiapplication.com
+  SITE_URL: https://join.rafiqi.sa
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      CAN_UPLOAD: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+      HAS_FTP: ${{ secrets.FTP_SERVER != '' }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Writes the site to out/. Also checks the TypeScript.
+      - run: npm run build
+
+      - name: Upload to Bluehost
+        if: env.CAN_UPLOAD == 'true' && env.HAS_FTP == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./out/
+          server-dir: ./
+
+      - name: Upload skipped
+        if: env.CAN_UPLOAD == 'true' && env.HAS_FTP != 'true'
+        run: echo "::warning::FTP_SERVER, FTP_USERNAME and FTP_PASSWORD are not set, so nothing was uploaded."

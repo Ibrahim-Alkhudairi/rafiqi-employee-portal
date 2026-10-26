@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
     title,
     description,
     icons: { icon: "/icon.png", apple: "/icon.png" },
-    alternates: { languages: { ar: "/ar", en: "/en" } },
+    alternates: { languages: { ar: "/ar/", en: "/en/" } },
   };
 }
 

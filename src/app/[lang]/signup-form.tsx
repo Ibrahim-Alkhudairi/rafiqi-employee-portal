@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { fill, type Content } from "@/content";
+import { saveSignup, type SignupField } from "@/lib/api";
 import { isPersonalEmail, isValidEmail } from "@/lib/normalize";
-import { autosave, type SignupField } from "./actions";
 import s from "./signup.module.css";
 
 type Values = { fullName: string; email: string; company: string };
@@ -42,9 +42,9 @@ function FieldStatus({ state }: { state: FieldState }) {
 }
 
 // No sign-up button. Each field gets its own check as soon as it is filled in
-// correctly; once all of them are, the details save to the database on their
-// own, and every later change saves again. The store badges appear after the
-// first save. A corrected email moves the saved row (the server checks the
+// correctly; once all of them are, the details save through the backend on
+// their own, and every later change saves again. The store badges appear after
+// the first save. A corrected email moves the saved row (the backend checks the
 // token it handed out) instead of adding a second one.
 export function SignupForm({
   t,
@@ -129,7 +129,7 @@ export function SignupForm({
     const started = Date.now();
     try {
       const prev = lastSaved.current;
-      const res = await autosave({
+      const res = await saveSignup({
         ...v,
         website: honeypot.current?.value,
         previous: prev ? { email: prev.email, token: prev.token } : undefined,

@@ -1,9 +1,9 @@
-import { headers } from "next/headers";
 import { content, fill, type Lang } from "@/content";
 import { companies } from "@/lib/companies";
 import { SignupForm } from "./signup-form";
 import s from "./signup.module.css";
-import { Footer, platformFrom, SkipLink, StoreBadges, TopBar } from "./ui";
+import { StoreBadges } from "./store-badges";
+import { Footer, SkipLink, TopBar } from "./ui";
 
 type Company = (typeof companies)[number];
 
@@ -11,9 +11,8 @@ type Company = (typeof companies)[number];
  * The sign-up page. Opened from a company's invite link (/[lang]/join/[slug]),
  * it names the company in the heading and has it already chosen in the form.
  */
-export async function SignupPage({ lang, company }: { lang: Lang; company?: Company }) {
+export function SignupPage({ lang, company }: { lang: Lang; company?: Company }) {
   const t = content[lang];
-  const platform = platformFrom((await headers()).get("user-agent"));
 
   return (
     <>
@@ -32,7 +31,7 @@ export async function SignupPage({ lang, company }: { lang: Lang; company?: Comp
             t={t.signup}
             companies={companies.map((c) => ({ key: c.key, label: c.name[lang] }))}
             initialCompany={company?.key}
-            badges={<StoreBadges t={t} platform={platform} />}
+            badges={<StoreBadges stores={t.stores} />}
           />
           <section className={s.steps} aria-labelledby="steps-title">
             <h2 id="steps-title" className={s.stepsTitle}>
