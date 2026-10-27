@@ -157,18 +157,28 @@ function InfoTip({ id, label, children }: { id: string; label: string; children:
 export function SignupForm({
   t,
   companies,
+  invite = false,
   initialCompany,
+  loadFailed = false,
+  onRetry,
   badges,
 }: {
   t: Content["signup"];
-  companies: { key: string; label: string }[];
-  /** Set when the page was opened from a company's invite link: that company is fixed. */
+  /** The companies to choose from, by slug; null while they load. */
+  companies: { key: string; label: string }[] | null;
+  /** Opened from a company's invite link: the company is fixed, shown with a lock. */
+  invite?: boolean;
+  /** On an invite link, its company, once the companies have loaded. */
   initialCompany?: string;
+  /** The companies couldn't load; onRetry tries again. */
+  loadFailed?: boolean;
+  onRetry?: () => void;
   badges: ReactNode;
 }) {
-  // Without an invite link the dropdown starts on the first company, so the
-  // company always starts chosen, with its check.
-  const startCompany = initialCompany ?? companies[0]?.key ?? "";
+  // An invite link's company is chosen for them. Otherwise the dropdown starts
+  // on "Choose your company", unless there is only one company to choose.
+  const startCompany = initialCompany ?? (!invite && companies?.length === 1 ? companies[0].key : "");
+  const loading = companies === null && !loadFailed;
   const start: Values = { ...empty, company: startCompany };
   const startStates: Record<SignupField, FieldState> = { ...noStates, company: startCompany ? "valid" : null };
   const [values, setValues] = useState<Values>(start);
@@ -203,6 +213,19 @@ export function SignupForm({
     },
     [],
   );
+
+  // The companies load after the page opens. Then the company chosen for them
+  // gets its check, as if it had been there from the start, and the details
+  // save if the rest is already filled in.
+  useEffect(() => {
+    if (!startCompany || valuesRef.current.company) return;
+    checkedValues.current.company = startCompany;
+    valuesRef.current = { ...valuesRef.current, company: startCompany };
+    setValues(valuesRef.current);
+    setFieldState("company", "valid");
+    scheduleSave(TYPING_PAUSE_MS);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs when the company to start on arrives
+  }, [startCompany]);
 
   const isSaved = () => lastSaved.current?.snapshot === JSON.stringify(valuesRef.current);
 
@@ -340,7 +363,10 @@ export function SignupForm({
   }
 
   const missing = missingFields(values);
-  const invalid = (f: SignupField) => serverFields.includes(f) || (touched.includes(f) && missing.includes(f));
+  const invalid = (f: SignupField) =>
+    serverFields.includes(f) || (touched.includes(f) && missing.includes(f) && (f !== "company" || companies !== null));
+  const companyState = loading ? "checking" : fieldStates.company;
+  const companyDescribedBy = ["company-hint", (loadFailed || invalid("company")) && "company-error"].filter(Boolean).join(" ");
   const unsaved = lastSaved.current?.snapshot !== JSON.stringify(values);
   const savedNow = status === "saved" && !unsaved;
   // Register until every field has its check, verify while saving, then download.
@@ -433,25 +459,32 @@ export function SignupForm({
         </div>
 
         <div className={s.field}>
-          <label htmlFor="company">{t.company}</label>
+          <label id="company-label" htmlFor={invite ? undefined : "company"}>
+            {t.company}
+          </label>
           <p id="company-hint" className="visually-hidden">
-            {initialCompany ? t.companyFixedHint : t.companyHint}
+            {invite ? t.companyFixedHint : t.companyHint}
           </p>
-          {initialCompany ? (
+          {invite ? (
             // From an invite link the company is fixed: shown, not choosable.
-            <div className={`${s.control} ${s.fixed}`}>
+            <div className={s.control}>
               <svg className={s.lock} viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
                 <rect x="4" y="9" width="12" height="8" rx="2" fill="currentColor" />
                 <path d="M7 9V6.5a3 3 0 0 1 6 0V9" fill="none" stroke="currentColor" strokeWidth="1.8" />
               </svg>
-              <input
+              <div
                 id="company"
-                name="company"
-                readOnly
-                value={companies.find((c) => c.key === initialCompany)?.label ?? ""}
-                aria-describedby="company-hint"
-              />
-              <FieldStatus state={fieldStates.company} />
+                role="textbox"
+                aria-readonly="true"
+                tabIndex={0}
+                className={s.fixedValue}
+                aria-labelledby="company-label"
+                aria-busy={loading || undefined}
+                aria-describedby={companyDescribedBy}
+              >
+                {companies?.find((c) => c.key === initialCompany)?.label}
+              </div>
+              <FieldStatus state={companyState} />
             </div>
           ) : (
             <div className={`${s.control} ${s.choose}`}>
@@ -459,31 +492,53 @@ export function SignupForm({
                 id="company"
                 name="company"
                 required
+                disabled={companies === null}
                 value={values.company}
                 onChange={(e) => {
                   setTouched((tf) => (tf.includes("company") ? tf : [...tf, "company"]));
                   update("company", e.target.value, false);
                 }}
                 onBlur={() => leave("company")}
+                aria-busy={loading || undefined}
                 aria-invalid={invalid("company") || undefined}
-                aria-describedby={invalid("company") ? "company-hint company-error" : "company-hint"}
+                aria-describedby={companyDescribedBy}
               >
-                {companies.map((c) => (
-                  <option key={c.key} value={c.key}>
-                    {c.label}
-                  </option>
-                ))}
+                {companies === null ? (
+                  <option value="">{loading ? t.companyLoading : ""}</option>
+                ) : (
+                  <>
+                    {!values.company && (
+                      <option value="" disabled>
+                        {t.companyPlaceholder}
+                      </option>
+                    )}
+                    {companies.map((c) => (
+                      <option key={c.key} value={c.key}>
+                        {c.label}
+                      </option>
+                    ))}
+                  </>
+                )}
               </select>
-              <FieldStatus state={fieldStates.company} />
+              <FieldStatus state={companyState} />
               <svg className={s.chevron} viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
                 <path d="M5 7.5l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
           )}
-          {invalid("company") && (
+          {loadFailed ? (
             <p id="company-error" className={s.error}>
-              {t.errors.company}
+              {t.companiesFailed}{" "}
+              <button type="button" className={s.retry} onClick={onRetry}>
+                {t.retry}
+              </button>
             </p>
+          ) : (
+            invalid("company") && (
+              <p id="company-error" className={s.error}>
+                {t.errors.company}
+              </p>
+            )
           )}
         </div>
 

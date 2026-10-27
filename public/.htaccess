@@ -25,6 +25,12 @@ ErrorDocument 404 /404.html
 
   # Short invite links: /join/zain opens the Arabic page for Zain.
   RewriteRule ^join/([a-z0-9-]+)/?$ /ar/join/$1/ [R=302,L]
+  RewriteRule ^(ar|en)/join/([a-z0-9-]+)$ /$1/join/$2/ [R=302,L]
+
+  # Companies are added in the backoffice, so the build has no page per
+  # company: every invite link gets the one invite page, which reads the
+  # company from the address. The address stays as it is.
+  RewriteRule ^(ar|en)/join/[a-z0-9-]+/$ /$1/join/index.html [L]
 </IfModule>
 
 <IfModule mod_headers.c>

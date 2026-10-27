@@ -28,6 +28,12 @@ export const ar: typeof en = {
     company: "الشركة",
     companyHint: "اختر الشركة التي تعمل بها.",
     companyFixedHint: "محددة من رابط الدعوة الخاص بشركتك.",
+    companyPlaceholder: "اختر شركتك",
+    companyLoading: "جارٍ تحميل الشركات…",
+    companiesFailed: "تعذّر تحميل قائمة الشركات.",
+    retry: "حاول مرة أخرى",
+    inviteInactive: "رابط الدعوة هذا غير مفعّل.",
+    inviteInactiveAction: "سجّل واختر شركتك",
     autosave: {
       idle: "تُحفظ بياناتك تلقائيًا بعد تعبئة كل الحقول.",
       saving: "جارٍ الحفظ…",

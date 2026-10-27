@@ -26,6 +26,12 @@ export const en = {
     company: "Company",
     companyHint: "Choose the company you work for.",
     companyFixedHint: "Set by your company's invite link.",
+    companyPlaceholder: "Choose your company",
+    companyLoading: "Loading companies…",
+    companiesFailed: "The list of companies couldn't load.",
+    retry: "Try again",
+    inviteInactive: "This invite link isn't active.",
+    inviteInactiveAction: "Sign up and choose your company",
     autosave: {
       idle: "Your details save automatically once every field is filled in.",
       saving: "Saving…",

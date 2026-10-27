@@ -17,19 +17,3 @@ export function isPersonalEmail(email: string): boolean {
   const domain = email.trim().toLowerCase().split("@")[1] ?? "";
   return PERSONAL_DOMAINS.has(domain) || PERSONAL_FAMILIES.test(domain);
 }
-
-// A grouping key for free-text company names: "ACME  Co." and "acme co"
-// become one company, and so do Arabic spellings that differ only in hamza,
-// taa marbuta, alif maqsura, tatweel or diacritics.
-export function companyKey(name: string): string {
-  return name
-    .normalize("NFKC")
-    .toLowerCase()
-    .replace(/[ً-ْٰـ]/g, "") // diacritics, tatweel
-    .replace(/[أإآٱ]/g, "ا")
-    .replace(/ة/g, "ه")
-    .replace(/ى/g, "ي")
-    .replace(/[^\p{L}\p{N}]+/gu, " ") // punctuation and symbols act as spaces
-    .trim()
-    .replace(/\s+/g, " ");
-}

@@ -7,7 +7,7 @@ export type SignupField = "fullName" | "email" | "company";
 export type SignupInput = {
   fullName: string;
   email: string;
-  company: string; // a key from src/lib/companies.ts
+  company: string; // a company's slug, from src/lib/companies.ts
   website?: string; // honeypot
   /** The email this browser saved last, with the token the backend gave it then. */
   previous?: { email: string; token: string };
@@ -18,7 +18,7 @@ export type SignupResult =
   | { ok: false; fields: SignupField[]; message?: "rateLimited" | "failed" };
 
 // Set at build time. Empty (local runs) means demo mode: saving is pretended.
-const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/+$/, "");
+export const API_URL =(process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/+$/, "");
 
 const FIELDS: SignupField[] = ["fullName", "email", "company"];
 

@@ -2,13 +2,13 @@
 
 A small web portal, for phone and desktop, in Arabic (`/ar/`, right to left) and English (`/en/`), at `https://join.rafiqi.sa`.
 
-- **Employees** fill in their name and email and pick their company from a dropdown, which starts on the first company in the list. There is no consent tick-box and no privacy link.
+- **Employees** fill in their name and email and pick their company from a dropdown, which starts on "Choose your company" (or on the company itself when there is only one). There is no consent tick-box and no privacy link.
   - A three-step roadmap above the form (Register, Verify, Download) follows their progress.
   - Each field shows its green check inside the field once it is filled in correctly. What counts as a company email is in the (i) tooltip beside the email label.
   - There is no sign-up button: the details save on their own once every field is valid.
   - After that first save, a popup opens with the App Store and Google Play links (a sheet from the bottom on phones). If they are still typing, it waits for a pause. Once closed, the "Download Rafiqi" button brings it back.
   - Later edits save automatically too. If someone corrects their email, their existing row moves to the new email instead of a second row being added. A signed token from the first save proves it's the same browser.
-- **Rafiqi admins** follow who has gone on to register in the app in the **backoffice**, on the "متابعة تسجيل الموظفين" page. The portal itself has no admin pages.
+- **Rafiqi admins** follow who has gone on to register in the app in the **backoffice**, on the "متابعة تسجيل الموظفين" page, and manage the companies from its "إدارة الشركات" button. The portal itself has no admin pages.
 
 ## How it works
 - **Static files:** the portal is built as plain HTML/JS (`output: "export"`) and served by Bluehost. It has no server and no database access.
@@ -16,12 +16,14 @@ A small web portal, for phone and desktop, in Arabic (`/ar/`, right to left) and
 - **Matching:** the backend sets `IsRegisteredInApp` (and it stays on) once `AspNetUsers.NormalizedEmail` has the same email. It checks every 15 minutes (Hangfire job `employee-tracking-sync`) and every time the backoffice page opens.
 
 ## Companies and invite links
-- **Adding a company:** add it to `src/lib/companies.ts` here **and** to `Companies` in the backend's `EmployeeSignupService`, which refuses companies it doesn't know. Currently only Zain (زين).
-- **Invite links:** each company has one, built from its `slug`:
-  - `/join/zain` (Arabic) or `/en/join/zain/` opens the form with the company already chosen, and the heading names it.
+- **Managed in the backoffice:** "متابعة تسجيل الموظفين" → "إدارة الشركات" adds a company (Arabic name, English name, invite link), renames it, hides it from the portal, or deletes it while nobody has signed up with it. They are stored in `dbo.EmployeeCompanies`; the first ones are Zain (زين), SIDF and NIEPD.
+- **No rebuild needed:** every page loads the companies when it opens, from `GET /api/portal/employee-signup/companies` (hidden ones are left out). The backend refuses sign-ups for companies that aren't listed or are hidden. In demo mode the list is built in (`src/lib/companies.ts`).
+- **Invite links:** each company has one, built from its `slug`, which can't change once the company is added:
+  - `/join/sidf` (Arabic) or `/en/join/sidf/` opens the form with the company already chosen, and the heading names it.
+  - The build has no page per company. `/ar/join/` and `/en/join/` are one invite page each, which `public/.htaccess` serves for every `/ar/join/<slug>/`; the page reads the company from the address.
   - Switching language keeps the invite.
-  - An unknown company in the link is a 404.
-- **Language:** the English name is what's stored, so sign-ups from the Arabic and English pages count as one company.
+  - A company that isn't listed, or is hidden, shows "This invite link isn't active" with a way to the plain sign-up page.
+- **Language:** the English name is what's stored, so sign-ups from the Arabic and English pages count as one company. The backoffice report shows each company's current English name.
 
 ## Settings
 Both are read at build time and end up in the pages; neither is a secret. The workflow sets them for production; locally they go in `.env.local`.
@@ -47,5 +49,5 @@ npm run build   # writes the site to out/
 ## Deploying
 - **GitHub Actions:** `.github/workflows/deploy.yml` builds on every push to `main` and every pull request. On `main` it uploads `out/` to Bluehost over FTPS ([FTP-Deploy-Action](https://github.com/SamKirkland/FTP-Deploy-Action), which only sends what changed).
 - **GitHub secrets:** `FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD`, for an FTP account limited to the subdomain's folder. Until they are set, the upload is skipped with a warning.
-- **Bluehost:** `join.rafiqi.sa` is a subdomain in cPanel with its own folder and the free SSL certificate. `public/.htaccess` (copied into `out/`) forces HTTPS, sends `/` to `/ar/` and `/join/<company>` to `/ar/join/<company>/`, sets the security headers and serves `404.html`.
-- **Order of steps:** deploy the backend with the signup endpoint first, then the portal.
+- **Bluehost:** `join.rafiqi.sa` is a subdomain in cPanel with its own folder and the free SSL certificate. `public/.htaccess` (copied into `out/`) forces HTTPS, sends `/` to `/ar/` and `/join/<company>` to `/ar/join/<company>/`, serves the invite page for every `/ar/join/<company>/`, sets the security headers and serves `404.html`.
+- **Order of steps:** deploy the backend first (its `AddEmployeeCompanies` migration creates the companies table), then the portal, which needs the companies endpoint.

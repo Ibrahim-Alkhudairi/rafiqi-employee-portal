@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { type Content, type Lang } from "@/content";
+import { LanguageLinks } from "./language-links";
 import s from "./ui.module.css";
 
 export function SkipLink({ t }: { t: Content }) {
@@ -11,7 +12,7 @@ export function SkipLink({ t }: { t: Content }) {
 }
 
 /** The navy top bar: app icon and name, and the language switch. */
-export function TopBar({ t, lang, path }: { t: Content; lang: Lang; path: string }) {
+export function TopBar({ t, lang }: { t: Content; lang: Lang }) {
   return (
     <header className={s.bar}>
       <div className={s.barInner}>
@@ -21,20 +22,7 @@ export function TopBar({ t, lang, path }: { t: Content; lang: Lang; path: string
           <span>{t.brand}</span>
         </Link>
         <div className={s.barEnd}>
-          <nav aria-label={t.language} className={s.langs}>
-            {t.languages.map((l) => (
-              <a
-                key={l.lang}
-                href={`/${l.lang}${path}/`}
-                lang={l.lang}
-                hrefLang={l.lang}
-                aria-current={l.lang === lang ? "page" : undefined}
-              >
-                {l.label}
-                {l.name && <span className="visually-hidden"> {l.name}</span>}
-              </a>
-            ))}
-          </nav>
+          <LanguageLinks t={t} lang={lang} />
         </div>
       </div>
     </header>
